@@ -56,11 +56,12 @@
                 </li>
             }
         </ul>
-
+    </div>
+    <div id="new-entry-section">
         @if (_showDescription)
         {
             <br />
-            <h3>Title - @_selectedItem.Title </h3>
+            <h3>Task - @_selectedItem.Title </h3>
             <p>@_selectedItem.Description</p>
             <button @onclick="ToggleDescription">Close Description</button>
             <button @onclick="() => ShowEditEntry(_selectedItem)">Edit Entry</button>
@@ -79,7 +80,7 @@
             <input @bind="_newTodoDescription" />
             <br />
             <p>Date To Complete</p>
-            <input @bind="_newTodoTime" />
+            <input type="date" @bind="_newTodoTime" />
             <br />
             <p>Priority (Higher = More important)</p>
             <input @bind="_priority" />
@@ -103,7 +104,7 @@
             <input @bind="_newTodoDescription" />
             <br />
             <p>Date To Complete</p>
-            <input @bind="_newTodoTime" />
+            <input type="date" @bind="_newTodoTime" />
             <br />
             <p>Priority (Higher = More important)</p>
             <input @bind="_priority" />
@@ -191,6 +192,7 @@
             _newTodoTitle = item.Title;
             _newTodoDescription = item.Description;
             _newTodoTime = item.DeadLine;
+            _priority = item.Priority;
         }
 
         void ConfirmedEditEntry()
@@ -210,7 +212,6 @@
 
         protected override void OnInitialized()
         {
-            // Create 20 random household chores as initial todos
             Random random = new Random();
 
             for (int i = 1; i <= 6; i++)
@@ -218,13 +219,15 @@
                 string randomChore = GetRandomChore();
                 _todos.Add(new ToDoItem
                 {
-                    Title = $"Chore {i}: {randomChore}",
-                    Description = $"Description for Chore {randomChore}",
+                    Title = $"{randomChore}",
+                    Description = $"{randomChore}",
                     DeadLine = DateOnly.FromDateTime(DateTime.Now.Date.AddDays(random.Next(1, 4))),
                     Priority = random.Next(1, 5)
                 });
             }
         }
+
+        private List<string> usedChores = new List<string>(); 
 
         private string GetRandomChore()
         {
@@ -251,9 +254,23 @@
                 };
 
             Random random = new Random();
-            int index = random.Next(householdChores.Length);
-            return householdChores[index];
+
+            var availableChores = householdChores.Except(usedChores).ToArray();
+
+            if (availableChores.Length == 0)
+            {
+                usedChores.Clear();
+                availableChores = householdChores;
+            }
+
+            int index = random.Next(availableChores.Length);
+            string selectedChore = availableChores[index];
+
+            usedChores.Add(selectedChore);
+            return selectedChore;
         }
+
+
     }
 </body>
 </html>

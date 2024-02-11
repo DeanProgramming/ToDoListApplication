@@ -63,3 +63,10 @@ input {
     padding: 25px;
     padding-left: 0px;
 }
+
+#new-entry-section {
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 20px; /* Adjust as needed */
+    margin-bottom: 20px; /* Adjust as needed */
+    overflow: auto; /* Add overflow property to clear any floats or positioning issues */
+}
