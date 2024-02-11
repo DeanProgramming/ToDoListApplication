@@ -9,7 +9,7 @@
 
 <ul>
     @{
-        var sortedTodos = _todos.OrderByDescending(t => t.Priority).ThenBy(t => t.DeadLine);
+        var sortedTodos = _todos.OrderBy(t => t.DeadLine).ThenByDescending(t => t.Priority);
         DateOnly lastEntry = DateOnly.MinValue;
     }
 
@@ -180,7 +180,9 @@ else if (_suppressTabs == false)
         _selectedItem.Title = _newTodoTitle;
         _selectedItem.Description = _newTodoDescription;
         _selectedItem.DeadLine = _newTodoTime;
+        _selectedItem.Priority = _priority;
         HideAllTabs();
+        _suppressTabs = false; 
     }
 
     int GetRemainingCount(DateOnly deadline)
