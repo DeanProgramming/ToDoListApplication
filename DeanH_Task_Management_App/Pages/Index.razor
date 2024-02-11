@@ -1,0 +1,190 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+@if (_todos.Count != 0)
+{
+    <h3>Todo (@_todos.Count(todo => !todo.IsDone))</h3>
+}
+
+<ul>
+    @{
+        var sortedTodos = _todos.OrderByDescending(t => t.Priority).ThenBy(t => t.DeadLine);
+        DateOnly lastEntry = DateOnly.MinValue;
+    }
+
+    @foreach (var todo in sortedTodos)
+    {
+        if (lastEntry == DateOnly.MinValue || todo.DeadLine != lastEntry)
+        {
+            if (GetRemainingCount(todo.DeadLine) == 0)
+            {
+                <h4>DeadLine - @todo.DeadLine - Completed every entry</h4>
+            }
+            else
+            {
+                <h4>DeadLine - @todo.DeadLine (@(GetRemainingCount(todo.DeadLine)) items remaining)</h4>
+            }
+
+            lastEntry = todo.DeadLine;
+        }
+
+        <li>
+            <input type="checkbox" @bind="todo.IsDone" />
+            <input @bind="todo.Title" />
+            <span>Priority: @todo.Priority</span>
+            <button @onclick="() => SelectEntry(todo)">View Description</button>
+            <button @onclick="() => DeleteEntry(todo)">Delete Entry</button>
+            <button @onclick="() => ShowEditEntry(todo)">Edit Entry</button>
+        </li>
+    }
+</ul>
+
+
+
+@if (_showDescription)
+{
+    <br />
+    <h3>Title - @_selectedItem.Title </h3>
+    <p>@_selectedItem.Description</p>
+    <button @onclick="ToggleDescription">Close Description</button>
+    <button @onclick="() => ShowEditEntry(_selectedItem)">Edit Entry</button>
+    <button @onclick="() => DeleteEntry(_selectedItem)">Delete Entry</button>
+}
+
+@if (_showCreateNewEntry)
+{
+    <br />
+    <h3>Create New Entry</h3>
+    <br />
+    <p>Title</p>
+    <input @bind="_newTodoTitle" />
+    <br />
+    <p>Description</p>
+    <input @bind="_newTodoDescription" />
+    <br />
+    <p>Date To Complete</p>
+    <input @bind="_newTodoTime" />
+    <br />
+    <p>Priority (Higher = More important)</p>
+    <input @bind="_priority" />
+    <br />
+    <button @onclick="AddTodo">Add todo</button>
+}
+else if (_suppressTabs == false)
+{
+    <button @onclick="ToggleCreateNewEntry">Create a new entry</button>
+}
+
+
+@if (_showEditEntry){
+    <br />
+    <h3>Edit Entry</h3>
+    <br />
+    <p>Title</p>
+    <input @bind="_newTodoTitle" />
+<br />
+    <p>Description</p>
+    <input @bind="_newTodoDescription" />
+    <br />
+    <p>Date To Complete</p>
+    <input @bind="_newTodoTime" />
+    <br />
+    <p>Priority (Higher = More important)</p>
+    <input @bind="_priority" />
+    <br />
+    <button @onclick="ConfirmedEditEntry">Confirm edit</button>
+}
+
+@code {
+    private bool _showCreateNewEntry = false;
+    private bool _showEditEntry = false;
+    private bool _showDescription = false;
+    private bool _suppressTabs = false;
+    private DateOnly _lastEntry = DateOnly.MinValue;
+
+    private ToDoItem _selectedItem = null;
+    private List<ToDoItem> _todos = new();
+
+    private string _newTodoTitle = "";
+    private string _newTodoDescription = "";
+    private DateOnly _newTodoTime = DateOnly.FromDateTime(DateTime.Now);
+    private int _priority = 1;
+
+    void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(_newTodoTitle))
+        {
+            _todos.Add(new ToDoItem { Title = _newTodoTitle, Description = _newTodoDescription, DeadLine = _newTodoTime, Priority = _priority });
+            _newTodoTitle = string.Empty;
+            _newTodoDescription = string.Empty;
+            _newTodoTime = DateOnly.FromDateTime(DateTime.Now);
+            _lastEntry = DateOnly.MinValue;
+            _priority = 1;
+            HideAllTabs();
+            _suppressTabs = false;
+        }
+    }
+
+    void HideAllTabs()
+    {
+        _showCreateNewEntry = false;
+        _showDescription = false;
+        _showEditEntry = false;
+        _suppressTabs = true;
+    }
+
+    void ToggleCreateNewEntry()
+    {
+        HideAllTabs();
+
+        _showCreateNewEntry = true; 
+    }
+
+    void ToggleDescription()
+    {
+        HideAllTabs(); 
+    }
+
+    void SelectEntry(ToDoItem item)
+    {
+        _selectedItem = item;
+        ToggleDescription();
+        _showDescription = true; 
+    }
+
+    void DeleteEntry(ToDoItem item)
+    {
+        _todos.Remove(item);
+
+        if (_showDescription)
+        {
+            _suppressTabs = false;
+        }
+
+        _showDescription = false;
+    }
+
+    void ShowEditEntry(ToDoItem item)
+    {
+        HideAllTabs(); 
+        _showEditEntry = true;
+        _selectedItem = item;
+        _newTodoTitle = item.Title;
+        _newTodoDescription = item.Description;
+        _newTodoTime = item.DeadLine;
+    }
+
+    void ConfirmedEditEntry()
+    { 
+        _selectedItem.Title = _newTodoTitle;
+        _selectedItem.Description = _newTodoDescription;
+        _selectedItem.DeadLine = _newTodoTime;
+        HideAllTabs();
+    }
+
+    int GetRemainingCount(DateOnly deadline)
+    {
+        return _todos.Count(t => t.DeadLine == deadline && !t.IsDone);
+    }
+}
