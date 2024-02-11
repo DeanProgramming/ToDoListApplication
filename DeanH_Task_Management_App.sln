@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeanH_Task_Management_App", "DeanH_Task_Management_App\DeanH_Task_Management_App.csproj", "{57991F4F-39D3-4017-8847-F030A0E9A857}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeanH_Task_Management_App", "DeanH_Task_Management_App\DeanH_Task_Management_App.csproj", "{57991F4F-39D3-4017-8847-F030A0E9A857}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
