@@ -66,7 +66,7 @@ input {
 
 #new-entry-section {
     border-bottom: 2px solid #ccc;
-    padding-bottom: 20px; /* Adjust as needed */
-    margin-bottom: 20px; /* Adjust as needed */
-    overflow: auto; /* Add overflow property to clear any floats or positioning issues */
+    padding-bottom: 20px;  
+    margin-bottom: 20px; 
+    overflow: auto; 
 }
